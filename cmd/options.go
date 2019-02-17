@@ -8,4 +8,5 @@ const (
 	optionPackage      = "package"
 	optionPlainText    = "plain-text"
 	optionMapName      = "bundle"
+	optionCompress     = "gzip"
 )

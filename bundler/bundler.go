@@ -2,6 +2,7 @@ package bundler
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -47,7 +48,7 @@ import (
 //While Bundle could be used for any file loading, it is intended to be used
 // with `go generate`, and is designed to be seamless with `viper`
 func Bundle(directory, matcher, prefix string, saveAsPlainText bool,
-	mapping map[string]string) (map[string]string, error) {
+	compress bool, mapping map[string]string) (map[string]string, error) {
 	bundle := make(map[string]string)
 	rootDir, err := filepath.Abs(directory)
 	if err != nil {
@@ -60,7 +61,7 @@ func Bundle(directory, matcher, prefix string, saveAsPlainText bool,
 	}
 
 	if err := filepath.Walk(rootDir, bundleWalkFn(rootDir, compiledMatcher,
-		saveAsPlainText, bundle)); err != nil {
+		saveAsPlainText, compress, bundle)); err != nil {
 		return nil, err
 	}
 
@@ -76,7 +77,7 @@ func Bundle(directory, matcher, prefix string, saveAsPlainText bool,
 
 //rootDir should be absolute path
 func bundleWalkFn(rootDir string, matcher *regexp.Regexp,
-	saveAsPlainText bool, bundle map[string]string,
+	saveAsPlainText bool, compress bool, bundle map[string]string,
 ) func(string, os.FileInfo, error) error {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -101,6 +102,10 @@ func bundleWalkFn(rootDir string, matcher *regexp.Regexp,
 			return err
 		}
 
+		if compress {
+			rawFile = compressData(rawFile)
+		}
+
 		if saveAsPlainText {
 			bundle[relPath] = string(rawFile)
 		} else {
@@ -108,6 +113,14 @@ func bundleWalkFn(rootDir string, matcher *regexp.Regexp,
 		}
 		return nil
 	}
+}
+
+func compressData(data []byte) []byte {
+	var b bytes.Buffer
+	w, _ := gzip.NewWriterLevel(&b, gzip.BestCompression)
+	_, _ = w.Write(data)
+	_ = w.Close()
+	return b.Bytes()
 }
 
 func readFile(path string) ([]byte, error) {

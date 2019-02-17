@@ -15,7 +15,7 @@ func TestBundledKeys(t *testing.T) {
 		t.Error(err)
 	}
 
-	bundle, err := Bundle(directory, "", "", true, nil)
+	bundle, err := Bundle(directory, "", "", true, false, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,7 +35,7 @@ func TestMatchedKeys(t *testing.T) {
 		t.Error(err)
 	}
 
-	bundle, err := Bundle(directory, ".*\\.json$", "", true, nil)
+	bundle, err := Bundle(directory, ".*\\.json$", "", true, false, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -59,7 +59,7 @@ func TestMappedKeys(t *testing.T) {
 		t.Error(err)
 	}
 
-	bundle, err := Bundle(directory, "", "", true, mapping)
+	bundle, err := Bundle(directory, "", "", true, false, mapping)
 	if err != nil {
 		t.Error(err)
 	}
@@ -79,7 +79,7 @@ func TestPrefixedKeys(t *testing.T) {
 		t.Error(err)
 	}
 
-	bundle, err := Bundle(directory, "", "FILE", true, nil)
+	bundle, err := Bundle(directory, "", "FILE", true, false, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -119,7 +119,7 @@ func TestContents(t *testing.T) {
 		t.Error(err)
 	}
 
-	bundle, err := Bundle(directory, "", "", true, nil)
+	bundle, err := Bundle(directory, "", "", true, false, nil)
 	if err != nil {
 		t.Error(err)
 	}
