@@ -18,7 +18,7 @@ var rootCmd = &cobra.Command{
 	RunE: func(_ *cobra.Command, _ []string) error {
 		m, err := bundler.Bundle(viper.GetString(optionSrcDirectory),
 			viper.GetString(optionMatcher), viper.GetString(optionPrefix),
-			viper.GetBool(optionPlainText), nil)
+			viper.GetBool(optionPlainText), viper.GetBool(optionCompress), nil)
 		if err != nil {
 			return err
 		}
@@ -54,4 +54,6 @@ func init() {
 		"save as plain text instead of base64")
 	rootCmd.Flags().StringP(optionMapName, "n",
 		"bundle", "name of generated map")
+	rootCmd.Flags().BoolP(optionCompress, "g", false,
+		"use best gzip compression")
 }
