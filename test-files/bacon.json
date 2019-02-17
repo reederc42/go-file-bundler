@@ -1,0 +1,7 @@
+{
+  "uri": "https://baconipsum.com/api",
+  "parameters": {
+    "type": "meat-and-filler"
+  },
+  "special-character": "`"
+}

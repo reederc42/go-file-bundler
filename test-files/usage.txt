@@ -1,0 +1,11 @@
+USAGE: some-command [options]
+
+Does some command, wrt options
+
+OPTIONS:
+
+option 1: yep, that's option 1
+option 2: very different from option 1
+option 3: similar to option 1, but...
+
+SPECIAL CHARACTER: `
