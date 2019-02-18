@@ -1,6 +1,7 @@
 package bundler
 
 import (
+	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"testing"
 )
@@ -14,17 +15,9 @@ func TestBundledKeys(t *testing.T) {
 	}
 
 	bundle, err := Bundle(directory, "", "", true, false, nil)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if _, ok := bundle["bacon.json"]; !ok {
-		t.Errorf("did not find expected key: bacon.json")
-	}
-
-	if _, ok := bundle["usage.txt"]; !ok {
-		t.Errorf("did not find expected key: usage.txt")
-	}
+	assert.NoError(t, err)
+	assert.Contains(t, bundle, "bacon.json")
+	assert.Contains(t, bundle, "usage.txt")
 }
 
 func TestMatchedKeys(t *testing.T) {
@@ -34,17 +27,9 @@ func TestMatchedKeys(t *testing.T) {
 	}
 
 	bundle, err := Bundle(directory, ".*\\.json$", "", true, false, nil)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if _, ok := bundle["bacon.json"]; !ok {
-		t.Errorf("did not find expected key: bacon.json")
-	}
-
-	if _, ok := bundle["usage.txt"]; ok {
-		t.Errorf("found unexpected key: usage.txt")
-	}
+	assert.NoError(t, err)
+	assert.Contains(t, bundle, "bacon.json")
+	assert.NotContains(t, bundle, "usage.txt")
 }
 
 func TestMappedKeys(t *testing.T) {
@@ -53,92 +38,49 @@ func TestMappedKeys(t *testing.T) {
 	}
 
 	directory, err := filepath.Abs(testFileDir)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 
 	bundle, err := Bundle(directory, "", "", true, false, mapping)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if _, ok := bundle["bacon"]; !ok {
-		t.Errorf("did not find expected key: bacon")
-	}
-
-	if _, ok := bundle["usage.txt"]; !ok {
-		t.Errorf("did not find expected key: usage.txt")
-	}
+	assert.NoError(t, err)
+	assert.Contains(t, bundle, "bacon")
+	assert.Contains(t, bundle, "usage.txt")
 }
 
 func TestPrefixedKeys(t *testing.T) {
 	directory, err := filepath.Abs(testFileDir)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 
 	bundle, err := Bundle(directory, "", "FILE", true, false, nil)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 
-	if _, ok := bundle["FILE/bacon.json"]; !ok {
-		t.Errorf("did not find expected key: FILE/bacon.json")
-	}
-
-	if _, ok := bundle["FILE/usage.txt"]; !ok {
-		t.Errorf("did not find expected key: FILE/usage.txt")
-	}
-
-	if _, ok := bundle["bacon.json"]; ok {
-		t.Errorf("found unexpected key: bacon.json")
-	}
-
-	if _, ok := bundle["usage.txt"]; ok {
-		t.Errorf("found unexpected key: usage.txt")
-	}
+	assert.Contains(t, bundle, "FILE/bacon.json")
+	assert.Contains(t, bundle, "FILE/usage.txt")
+	assert.NotContains(t, bundle, "bacon.json")
+	assert.NotContains(t, bundle, "usage.txt")
 }
 
 func TestContents(t *testing.T) {
 	directory, err := filepath.Abs(testFileDir)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 
 	baconJsonPath := filepath.Join(directory, "bacon.json")
 	baconJsonContents, err := readFile(baconJsonPath)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 
 	usageTxtPath := filepath.Join(directory, "usage.txt")
 	usageTxtContents, err := readFile(usageTxtPath)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 
 	bundle, err := Bundle(directory, "", "", true, false, nil)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 
-	bundledBacon, ok := bundle["bacon.json"]
-	if !ok {
-		t.Errorf("did not find expected key: bacon.json")
-	}
+	assert.Contains(t, bundle, "bacon.json")
+	bundledBacon, _ := bundle["bacon.json"]
+	assert.Equal(t, string(baconJsonContents), bundledBacon)
 
-	if string(baconJsonContents) != bundledBacon {
-		t.Errorf("bundled bacon content does not equal expected content")
-	}
-
-	bundledUsage, ok := bundle["usage.txt"]
-	if !ok {
-		t.Errorf("did not find expected key: usage.txt")
-	}
-
-	if string(usageTxtContents) != bundledUsage {
-		t.Errorf("bundled usage content does not equal expected content")
-	}
+	assert.Contains(t, bundle, "usage.txt")
+	bundledUsage, _ := bundle["usage.txt"]
+	assert.Equal(t, string(usageTxtContents), bundledUsage)
 }
 
 func TestRemap(t *testing.T) {
@@ -152,11 +94,6 @@ func TestRemap(t *testing.T) {
 
 	remap(src, mapping)
 
-	if _, ok := src["key1"]; !ok {
-		t.Errorf("did not find expected key: key1")
-	}
-
-	if _, ok := src["k1"]; ok {
-		t.Errorf("found unexpected key: k1")
-	}
+	assert.Contains(t, src, "key1")
+	assert.NotContains(t, src, "k1")
 }
