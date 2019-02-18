@@ -9,4 +9,5 @@ const (
 	optionPlainText    = "plain-text"
 	optionMapName      = "bundle"
 	optionCompress     = "gzip"
+	optionViper        = "viper"
 )

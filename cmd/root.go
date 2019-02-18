@@ -23,8 +23,14 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 		f, _ := os.Create(viper.GetString(optionDstFile))
-		err = bundler.WriteBundle(f, viper.GetString(optionPackage),
-			viper.GetString(optionPackage), m)
+		if viper.GetBool(optionViper) {
+			err = bundler.WriteBundleWithViper(f,
+				viper.GetString(optionPackage), viper.GetString(optionMapName),
+				m)
+		} else {
+			err = bundler.WriteBundle(f, viper.GetString(optionPackage),
+				viper.GetString(optionMapName), m)
+		}
 		return err
 	},
 }
@@ -56,4 +62,5 @@ func init() {
 		"bundle", "name of generated map")
 	rootCmd.Flags().BoolP(optionCompress, "g", false,
 		"use best gzip compression")
+	rootCmd.Flags().BoolP(optionViper, "v", false, "integrate with viper")
 }
