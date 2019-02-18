@@ -23,8 +23,8 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 		f, _ := os.Create(viper.GetString(optionDstFile))
-		err = bundler.WriteMap(f, m, viper.GetString(optionPackage),
-			viper.GetString(optionMapName))
+		err = bundler.WriteBundle(f, viper.GetString(optionPackage),
+			viper.GetString(optionPackage), m)
 		return err
 	},
 }
