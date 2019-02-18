@@ -158,17 +158,32 @@ func createPrefixedKeyRemapping(prefix string,
 	return p
 }
 
-func WriteBundle(w io.Writer, goPackage, varName string, bundle map[string]string) error {
-	data := struct {
-		Package string
-		Name    string
-		Value   string
-	}{
+type bundleData struct {
+	Package string
+	Name    string
+	Value   string
+}
+
+func WriteBundleWithViper(w io.Writer, goPackage, varName string,
+	bundle map[string]string) error {
+	return writeBundleWithTemplate(w, goPackage, varName, bundle,
+		bundleWithViperTemplate)
+}
+
+func WriteBundle(w io.Writer, goPackage, varName string,
+	bundle map[string]string) error {
+	return writeBundleWithTemplate(w, goPackage, varName, bundle,
+		bundleTemplate)
+}
+
+func writeBundleWithTemplate(w io.Writer, goPackage, varName string,
+	bundle map[string]string, bundleTpl string) error {
+	data := bundleData{
 		Package: goPackage,
 		Name:    varName,
 		Value:   fmt.Sprintf("%#v", bundle),
 	}
-	tpl, err := template.New("").Parse(bundleTemplate)
+	tpl, err := template.New("").Parse(bundleTpl)
 	if err != nil {
 		return err
 	}
