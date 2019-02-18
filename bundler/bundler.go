@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"text/template"
 )
 
 //Bundle maps file contents to keys, that can be used as strings in a Go
@@ -47,8 +48,8 @@ import (
 //Note:
 //While Bundle could be used for any file loading, it is intended to be used
 // with `go generate`, and is designed to be seamless with `viper`
-func Bundle(directory, matcher, prefix string, saveAsPlainText bool,
-	compress bool, mapping map[string]string) (map[string]string, error) {
+func Bundle(directory, matcher, prefix string, saveAsPlainText, compress bool,
+	mapping map[string]string) (map[string]string, error) {
 	bundle := make(map[string]string)
 	rootDir, err := filepath.Abs(directory)
 	if err != nil {
@@ -76,8 +77,8 @@ func Bundle(directory, matcher, prefix string, saveAsPlainText bool,
 }
 
 //rootDir should be absolute path
-func bundleWalkFn(rootDir string, matcher *regexp.Regexp,
-	saveAsPlainText bool, compress bool, bundle map[string]string,
+func bundleWalkFn(rootDir string, matcher *regexp.Regexp, saveAsPlainText,
+	compress bool, bundle map[string]string,
 ) func(string, os.FileInfo, error) error {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -157,19 +158,19 @@ func createPrefixedKeyRemapping(prefix string,
 	return p
 }
 
-//WriteMap generates correct Go code to create the map named `mapName` contained
-// in bundle
-func WriteMap(w io.Writer, bundle map[string]string, packageName,
-	mapName string) error {
-	var b bytes.Buffer
-	for k, v := range bundle {
-		_, err := fmt.Fprintf(&b, "\t\"%s\": \"%s\",\n", k, v)
-		if err != nil {
-			return err
-		}
+func WriteBundle(w io.Writer, goPackage, varName string, bundle map[string]string) error {
+	data := struct {
+		Package string
+		Name    string
+		Value   string
+	}{
+		Package: goPackage,
+		Name:    varName,
+		Value:   fmt.Sprintf("%#v", bundle),
 	}
-	_, err := fmt.Fprintf(w,
-		"//Generated File\npackage %s\n\nvar %s = map[string]string{\n%s}\n",
-		packageName, mapName, b.String())
-	return err
+	tpl, err := template.New("").Parse(bundleTemplate)
+	if err != nil {
+		return err
+	}
+	return tpl.Execute(w, data)
 }

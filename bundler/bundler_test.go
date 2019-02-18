@@ -1,8 +1,6 @@
 package bundler
 
 import (
-	"bytes"
-	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"testing"
 )
@@ -161,23 +159,4 @@ func TestRemap(t *testing.T) {
 	if _, ok := src["k1"]; ok {
 		t.Errorf("found unexpected key: k1")
 	}
-}
-
-func TestWriteMap(t *testing.T) {
-	packageName := "test_files_test"
-	mapName := "bundle"
-	bundle := map[string]string{
-		"test-files/bacon.json": "ewogICJ1cmkiOiAiaHR0cHM6Ly9iYWNvbmlwc3VtLmNvbS9hcGkiLAogICJwYXJhbWV0ZXJzIjogewogICAgInR5cGUiOiAibWVhdC1hbmQtZmlsbGVyIgogIH0sCiAgInNwZWNpYWwtY2hhcmFjdGVyIjogImAiCn0=",
-	}
-	expectedFile := `//Generated File
-package test_files_test
-
-var bundle = map[string]string{
-	"test-files/bacon.json": "ewogICJ1cmkiOiAiaHR0cHM6Ly9iYWNvbmlwc3VtLmNvbS9hcGkiLAogICJwYXJhbWV0ZXJzIjogewogICAgInR5cGUiOiAibWVhdC1hbmQtZmlsbGVyIgogIH0sCiAgInNwZWNpYWwtY2hhcmFjdGVyIjogImAiCn0=",
-}
-`
-	var b bytes.Buffer
-	err := WriteMap(&b, bundle, packageName, mapName)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedFile, b.String())
 }
