@@ -11,7 +11,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "file-bundler",
 	Short: "bundles files into Go code",
-	Long:  "bundles files into Go code",
+	Long:  help,
 	PreRunE: func(cmd *cobra.Command, _ []string) error {
 		return viper.BindPFlags(cmd.Flags())
 	},
@@ -64,3 +64,39 @@ func init() {
 		"use best gzip compression")
 	rootCmd.Flags().BoolP(optionViper, "v", false, "integrate with viper")
 }
+
+var help = `Bundle maps file contents to keys, that can be used as strings in a Go
+	application. File contents are stored as strings. Keys are defined as:
+[prefix]/path-from-[directory]/filename
+If [prefix] is empty string, the leading '/' is discarded
+For example,
+	Given directory=file-bundler/test-files
+	And prefix=TEST
+	Then the key for "bacon.json" is TEST/bacon.json
+
+	Given directory=file-bundler/test-files
+	And prefix=""
+	Then the key for "bacon.json" is bacon.json
+
+Prefixes are applied after the matcher and mapping
+
+matcher is a regular expression that determines which files are included. Each
+	filename under "directory" is tested, and is included if matched. The matcher
+	is tested against absolute filepaths. The matcher is applied before mapping.
+For example,
+	Given directory=file-bundler/test-files
+	And matcher=*.json
+	Then "bacon.json" is bundled, and "usage.txt" is not
+
+mapping explicitly overrides file keying.
+For example,
+	Given directory=file-bundler
+	And mapping has the element: "test-files/bacon.json": "bacon"
+	Then the key for "test-files/bacon.json" is "bacon"
+
+Default arguments:
+matcher='.*'
+
+Note:
+While file-bundler could be used for any file loading, it is intended to be used
+	with 'go generate' and 'viper'`
