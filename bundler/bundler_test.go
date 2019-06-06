@@ -1,12 +1,13 @@
 package bundler
 
 import (
-	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-const testFileDir = "../test-files"
+const testFileDir = "../testdata"
 
 func TestBundledKeys(t *testing.T) {
 	directory, err := filepath.Abs(testFileDir)

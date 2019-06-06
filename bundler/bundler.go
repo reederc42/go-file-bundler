@@ -18,11 +18,11 @@ import (
 //[prefix]/path-from-[directory]/filename
 //If [prefix] is empty string, the leading '/' is discarded
 //For example,
-// Given directory=file-bundler/test-files
+// Given directory=file-bundler/testdata
 // And prefix=TEST
 // Then the key for "bacon.json" is TEST/bacon.json
 //
-// Given directory=file-bundler/test-files
+// Given directory=file-bundler/testdata
 // And prefix=""
 // Then the key for "bacon.json" is bacon.json
 //
@@ -32,15 +32,15 @@ import (
 // filename under "directory" is tested, and is included if matched. The matcher
 // is tested against absolute filepaths. The matcher is applied before mapping.
 //For example,
-// Given directory=file-bundler/test-files
+// Given directory=file-bundler/testdata
 // And matcher=*.json
 // Then "bacon.json" is bundled, and "usage.txt" is not
 //
 //mapping explicitly overrides file keying.
 //For example,
 // Given directory=file-bundler
-// And mapping has the element: "test-files/bacon.json": "bacon"
-// Then the key for "test-files/bacon.json" is "bacon"
+// And mapping has the element: "testdata/bacon.json": "bacon"
+// Then the key for "testdata/bacon.json" is "bacon"
 //
 //Default arguments:
 //matcher=`.*`
