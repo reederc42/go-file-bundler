@@ -1,4 +1,4 @@
-module github.com/reederc42/file-bundler
+module github.com/reederc42/go-file-bundler
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect

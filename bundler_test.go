@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testFileDir = "../testdata"
+const testFileDir = "testdata"
 
 func TestBundledKeys(t *testing.T) {
 	directory, err := filepath.Abs(testFileDir)

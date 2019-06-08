@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/reederc42/file-bundler/bundler"
+	"github.com/reederc42/go-file-bundler"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
