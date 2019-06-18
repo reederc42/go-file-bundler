@@ -11,4 +11,5 @@ const (
 	optionCompress       = "gzip"
 	optionViper          = "viper"
 	optionSuppressErrors = "suppress-errors"
+	optionHTTPPaths      = "http-paths"
 )

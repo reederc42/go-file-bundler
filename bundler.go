@@ -8,8 +8,10 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"text/template"
 )
 
@@ -48,8 +50,8 @@ import (
 //Note:
 //While Bundle could be used for any file loading, it is intended to be used
 // with `go generate`, and is designed to be seamless with `viper`
-func Bundle(directory, matcher, prefix string, saveAsPlainText, compress bool,
-	mapping map[string]string) (map[string]string, error) {
+func Bundle(directory, matcher, prefix string, saveAsPlainText, compress,
+	httpPaths bool, mapping map[string]string) (map[string]string, error) {
 	bundle := make(map[string]string)
 	rootDir, err := filepath.Abs(directory)
 	if err != nil {
@@ -62,14 +64,14 @@ func Bundle(directory, matcher, prefix string, saveAsPlainText, compress bool,
 	}
 
 	if err := filepath.Walk(rootDir, bundleWalkFn(rootDir, compiledMatcher,
-		saveAsPlainText, compress, bundle)); err != nil {
+		saveAsPlainText, compress, httpPaths, bundle)); err != nil {
 		return nil, err
 	}
 
 	remap(bundle, mapping)
 
 	if prefix != "" {
-		prefixMapping := createPrefixedKeyRemapping(prefix, bundle)
+		prefixMapping := createPrefixedKeyRemapping(prefix, httpPaths, bundle)
 		remap(bundle, prefixMapping)
 	}
 
@@ -78,7 +80,7 @@ func Bundle(directory, matcher, prefix string, saveAsPlainText, compress bool,
 
 //rootDir should be absolute path
 func bundleWalkFn(rootDir string, matcher *regexp.Regexp, saveAsPlainText,
-	compress bool, bundle map[string]string,
+	compress, httpPaths bool, bundle map[string]string,
 ) func(string, os.FileInfo, error) error {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -92,6 +94,10 @@ func bundleWalkFn(rootDir string, matcher *regexp.Regexp, saveAsPlainText,
 		relPath, err := filepath.Rel(rootDir, path)
 		if err != nil {
 			return err
+		}
+
+		if httpPaths {
+			relPath = strings.Replace(relPath, "\\", "/", -1)
 		}
 
 		if !matcher.MatchString(relPath) {
@@ -146,12 +152,19 @@ func remap(src, mapping map[string]string) {
 
 //remappings are defined as oldKey:newKey
 //creates a remapping map with prefixed keys
-func createPrefixedKeyRemapping(prefix string,
+func createPrefixedKeyRemapping(prefix string, httpPaths bool,
 	src map[string]string) map[string]string {
 	p := make(map[string]string)
 
-	for oldKey, _ := range src {
-		newKey := filepath.Join(prefix, oldKey)
+	fmt.Printf("Use path: %v", httpPaths)
+
+	for oldKey := range src {
+		newKey := ""
+		if httpPaths {
+			newKey = path.Join(prefix, oldKey)
+		} else {
+			newKey = filepath.Join(prefix, oldKey)
+		}
 		p[oldKey] = newKey
 	}
 

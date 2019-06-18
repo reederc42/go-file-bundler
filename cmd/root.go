@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/reederc42/go-file-bundler"
+	bundler "github.com/reederc42/go-file-bundler"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -19,7 +19,8 @@ var rootCmd = &cobra.Command{
 	RunE: func(_ *cobra.Command, _ []string) error {
 		m, err := bundler.Bundle(viper.GetString(optionSrcDirectory),
 			viper.GetString(optionMatcher), viper.GetString(optionPrefix),
-			viper.GetBool(optionPlainText), viper.GetBool(optionCompress), nil)
+			viper.GetBool(optionPlainText), viper.GetBool(optionCompress),
+			viper.GetBool(optionHTTPPaths), nil)
 		if err != nil && !viper.GetBool(optionSuppressErrors) {
 			return err
 		} else if err != nil && viper.GetBool(optionSuppressErrors) {
@@ -68,6 +69,8 @@ func init() {
 	rootCmd.Flags().BoolP(optionViper, "v", false, "integrate with viper")
 	rootCmd.Flags().Bool(optionSuppressErrors, false,
 		"on error writes empty output")
+	rootCmd.Flags().Bool(optionHTTPPaths, false,
+		"sets path separator to http /")
 }
 
 var help = `Bundle maps file contents to keys, that can be used as strings in a Go

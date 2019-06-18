@@ -15,7 +15,7 @@ func TestBundledKeys(t *testing.T) {
 		t.Error(err)
 	}
 
-	bundle, err := Bundle(directory, "", "", true, false, nil)
+	bundle, err := Bundle(directory, "", "", true, false, true, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, bundle, "bacon.json")
 	assert.Contains(t, bundle, "usage.txt")
@@ -27,7 +27,7 @@ func TestMatchedKeys(t *testing.T) {
 		t.Error(err)
 	}
 
-	bundle, err := Bundle(directory, ".*\\.json$", "", true, false, nil)
+	bundle, err := Bundle(directory, ".*\\.json$", "", true, false, true, nil)
 	assert.NoError(t, err)
 	assert.Contains(t, bundle, "bacon.json")
 	assert.NotContains(t, bundle, "usage.txt")
@@ -41,7 +41,7 @@ func TestMappedKeys(t *testing.T) {
 	directory, err := filepath.Abs(testFileDir)
 	assert.NoError(t, err)
 
-	bundle, err := Bundle(directory, "", "", true, false, mapping)
+	bundle, err := Bundle(directory, "", "", true, false, true, mapping)
 	assert.NoError(t, err)
 	assert.Contains(t, bundle, "bacon")
 	assert.Contains(t, bundle, "usage.txt")
@@ -51,7 +51,7 @@ func TestPrefixedKeys(t *testing.T) {
 	directory, err := filepath.Abs(testFileDir)
 	assert.NoError(t, err)
 
-	bundle, err := Bundle(directory, "", "FILE", true, false, nil)
+	bundle, err := Bundle(directory, "", "FILE", true, false, true, nil)
 	assert.NoError(t, err)
 
 	assert.Contains(t, bundle, "FILE/bacon.json")
@@ -64,20 +64,20 @@ func TestContents(t *testing.T) {
 	directory, err := filepath.Abs(testFileDir)
 	assert.NoError(t, err)
 
-	baconJsonPath := filepath.Join(directory, "bacon.json")
-	baconJsonContents, err := readFile(baconJsonPath)
+	baconJSONPath := filepath.Join(directory, "bacon.json")
+	baconJSONContents, err := readFile(baconJSONPath)
 	assert.NoError(t, err)
 
 	usageTxtPath := filepath.Join(directory, "usage.txt")
 	usageTxtContents, err := readFile(usageTxtPath)
 	assert.NoError(t, err)
 
-	bundle, err := Bundle(directory, "", "", true, false, nil)
+	bundle, err := Bundle(directory, "", "", true, false, true, nil)
 	assert.NoError(t, err)
 
 	assert.Contains(t, bundle, "bacon.json")
 	bundledBacon, _ := bundle["bacon.json"]
-	assert.Equal(t, string(baconJsonContents), bundledBacon)
+	assert.Equal(t, string(baconJSONContents), bundledBacon)
 
 	assert.Contains(t, bundle, "usage.txt")
 	bundledUsage, _ := bundle["usage.txt"]
