@@ -156,8 +156,6 @@ func createPrefixedKeyRemapping(prefix string, httpPaths bool,
 	src map[string]string) map[string]string {
 	p := make(map[string]string)
 
-	fmt.Printf("Use path: %v", httpPaths)
-
 	for oldKey := range src {
 		newKey := ""
 		if httpPaths {
